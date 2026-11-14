@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AdMix AI — Media Mix & Sales Forecasting Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    input[type="range"]::-webkit-slider-thumb {
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 h-full flex flex-col antialiased">
+
+  <!-- Top Header Navigation -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold shadow-md shadow-blue-500/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+        </div>
+        <div>
+          <span class="font-bold text-slate-900 text-lg tracking-tight">AdMix<span class="text-blue-600">AI</span></span>
+          <span class="hidden sm:inline-block ml-2 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100/60">
+            LinearRegression (v1.6.1)
+          </span>
+        </div>
+      </div>
+      <div class="flex items-center space-x-3">
+        <button onclick="resetDefaults()" class="inline-flex items-center text-xs font-semibold text-slate-600 hover:text-slate-900 px-3.5 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 shadow-2xs transition">
+          <svg class="w-3.5 h-3.5 mr-1.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          Reset Defaults
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Title and Subtitle -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 pb-4 border-b border-slate-200">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Media Mix Attribution & Forecasting</h1>
+        <p class="text-sm text-slate-500 mt-1">Real-time inference engine powered by your trained Ordinary Least Squares (OLS) regression model.</p>
+      </div>
+      <div class="mt-4 md:mt-0 flex items-center space-x-2 text-xs font-medium text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200/60 self-start">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>Model Status: Active & Operational</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Left Column: Sliders & Controls (5 Cols) -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 space-y-6">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500">Channel Budget Allocations</h2>
+            <span class="text-xs font-semibold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md">USD in Thousands ($K)</span>
+          </div>
+
+          <!-- TV Slider -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                <span class="w-3 h-3 rounded-md bg-blue-600 shadow-xs"></span> TV Advertising
+              </label>
+              <div class="flex items-center bg-slate-50 border border-slate-200 rounded-lg overflow-hidden px-2 py-1">
+                <span class="text-xs text-slate-400 mr-1">$</span>
+                <input type="number" id="tvNum" min="0" max="300" step="1" value="150" 
+                  class="w-16 text-right font-semibold text-sm bg-transparent text-slate-800 focus:outline-none">
+                <span class="text-xs text-slate-400 ml-1">k</span>
+              </div>
+            </div>
+            <input type="range" id="tvSlider" min="0" max="300" step="1" value="150" 
+              class="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600">
+            <div class="flex justify-between text-[11px] text-slate-400">
+              <span>$0k</span>
+              <span>Max: $300k</span>
+            </div>
+          </div>
+
+          <!-- Radio Slider -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                <span class="w-3 h-3 rounded-md bg-emerald-500 shadow-xs"></span> Radio Advertising
+              </label>
+              <div class="flex items-center bg-slate-50 border border-slate-200 rounded-lg overflow-hidden px-2 py-1">
+                <span class="text-xs text-slate-400 mr-1">$</span>
+                <input type="number" id="radioNum" min="0" max="50" step="0.5" value="25" 
+                  class="w-16 text-right font-semibold text-sm bg-transparent text-slate-800 focus:outline-none">
+                <span class="text-xs text-slate-400 ml-1">k</span>
+              </div>
+            </div>
+            <input type="range" id="radioSlider" min="0" max="50" step="0.5" value="25" 
+              class="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+            <div class="flex justify-between text-[11px] text-slate-400">
+              <span>$0k</span>
+              <span>Max: $50k</span>
+            </div>
+          </div>
+
+          <!-- Newspaper Slider -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <label class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                <span class="w-3 h-3 rounded-md bg-amber-500 shadow-xs"></span> Newspaper Advertising
+              </label>
+              <div class="flex items-center bg-slate-50 border border-slate-200 rounded-lg overflow-hidden px-2 py-1">
+                <span class="text-xs text-slate-400 mr-1">$</span>
+                <input type="number" id="newsNum" min="0" max="120" step="0.5" value="30" 
+                  class="w-16 text-right font-semibold text-sm bg-transparent text-slate-800 focus:outline-none">
+                <span class="text-xs text-slate-400 ml-1">k</span>
+              </div>
+            </div>
+            <input type="range" id="newsSlider" min="0" max="120" step="0.5" value="30" 
+              class="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-amber-500">
+            <div class="flex justify-between text-[11px] text-slate-400">
+              <span>$0k</span>
+              <span>Max: $120k</span>
+            </div>
+          </div>
+
+          <!-- Total Campaign Spend Summary -->
+          <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-sm font-semibold text-slate-500">Total Campaign Budget</span>
+            <span id="totalBudgetDisplay" class="text-lg font-bold text-slate-900">$205.0k</span>
+          </div>
+        </div>
+
+        <!-- Model Specs Card -->
+        <div class="bg-slate-900 text-slate-300 rounded-2xl p-6 shadow-sm space-y-3 text-xs">
+          <div class="flex items-center justify-between text-white font-bold text-sm pb-2.5 border-b border-slate-800">
+            <span>Model Metadata</span>
+            <span class="text-emerald-400 font-mono">scikit-learn</span>
+          </div>
+          <div class="flex justify-between"><span class="text-slate-400">Algorithm:</span> <span class="font-mono text-slate-200">LinearRegression</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Intercept (β₀):</span> <span class="font-mono text-slate-200">2.9389</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">TV Coef (β₁):</span> <span class="font-mono text-slate-200">0.0458</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Radio Coef (β₂):</span> <span class="font-mono text-slate-200">0.1885</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Newspaper Coef (β₃):</span> <span class="font-mono text-slate-200">-0.0010</span></div>
+        </div>
+      </div>
+
+      <!-- Right Column: Analytics & Visualization (7 Cols) -->
+      <div class="lg:col-span-7 space-y-6">
+        
+        <!-- KPI Metrics Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Predicted Sales</p>
+            <p id="predictedSalesDisplay" class="text-3xl font-extrabold text-blue-600 mt-2">14.47k</p>
+            <p class="text-xs text-slate-400 mt-1">Expected units sold</p>
+          </div>
+          
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Top Growth Driver</p>
+            <p id="topDriverDisplay" class="text-2xl font-bold text-slate-900 mt-2">TV</p>
+            <p id="topDriverImpact" class="text-xs text-emerald-600 font-semibold mt-1">+6.86k units contributed</p>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Efficiency Ratio</p>
+            <p id="efficiencyDisplay" class="text-2xl font-bold text-slate-900 mt-2">70.6</p>
+            <p class="text-xs text-slate-400 mt-1">Units per $1k invested</p>
+          </div>
+        </div>
+
+        <!-- ROI / Attribution Breakdown Chart -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-base font-bold text-slate-900">Sales Attribution Breakdown</h2>
+              <p class="text-xs text-slate-500">Marginal contribution of baseline intercept and individual media channels</p>
+            </div>
+          </div>
+          <div class="h-64">
+            <canvas id="attributionChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Live Inference Formula Bar -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Live Equation Execution</h3>
+          <div id="formulaText" class="font-mono text-xs sm:text-sm bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-slate-700 overflow-x-auto">
+            Sales = 2.9389 + (0.0458 × TV) + (0.1885 × Radio) + (-0.0010 × Newspaper)
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Trained Model Weights from sklearn pickle
+    const WEIGHTS = {
+      intercept: 2.938889,
+      tv: 0.045765,
+      radio: 0.188530,
+      newspaper: -0.001037
+    };
+
+    // DOM Elements mapping
+    const elements = {
+      tvSlider: document.getElementById('tvSlider'),
+      tvNum: document.getElementById('tvNum'),
+      radioSlider: document.getElementById('radioSlider'),
+      radioNum: document.getElementById('radioNum'),
+      newsSlider: document.getElementById('newsSlider'),
+      newsNum: document.getElementById('newsNum'),
+      totalBudget: document.getElementById('totalBudgetDisplay'),
+      predictedSales: document.getElementById('predictedSalesDisplay'),
+      topDriver: document.getElementById('topDriverDisplay'),
+      topDriverImpact: document.getElementById('topDriverImpact'),
+      efficiency: document.getElementById('efficiencyDisplay'),
+      formula: document.getElementById('formulaText')
+    };
+
+    // Initialize Chart.js
+    const ctx = document.getElementById('attributionChart').getContext('2d');
+    const attributionChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Baseline (Intercept)', 'TV Lift', 'Radio Lift', 'Newspaper Lift'],
+        datasets: [{
+          data: [0, 0, 0, 0],
+          backgroundColor: ['#94a3b8', '#2563eb', '#10b981', '#f59e0b'],
+          borderRadius: 8,
+          barThickness: 40
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ` ${ctx.parsed.y.toFixed(3)}k units`
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: { color: '#f1f5f9' },
+            ticks: { font: { size: 11 } }
+          },
+          x: {
+            grid: { display: false },
+            ticks: { font: { size: 11, weight: '600' } }
+          }
+        }
+      }
+    });
+
+    function calculatePrediction() {
+      const tv = parseFloat(elements.tvNum.value) || 0;
+      const radio = parseFloat(elements.radioNum.value) || 0;
+      const news = parseFloat(elements.newsNum.value) || 0;
+
+      const base = WEIGHTS.intercept;
+      const tvLift = WEIGHTS.tv * tv;
+      const radioLift = WEIGHTS.radio * radio;
+      const newsLift = WEIGHTS.newspaper * news;
+      
+      const totalSales = Math.max(0, base + tvLift + radioLift + newsLift);
+      const totalSpend = tv + radio + news;
+
+      // Update KPIs
+      elements.totalBudget.textContent = `$${totalSpend.toFixed(1)}k`;
+      elements.predictedSales.textContent = `${totalSales.toFixed(2)}k`;
+      
+      const effRatio = totalSpend > 0 ? ((totalSales * 1000) / totalSpend).toFixed(1) : '0.0';
+      elements.efficiency.textContent = effRatio;
+
+      // Determine Top Driver
+      const drivers = [
+        { name: 'TV', val: tvLift },
+        { name: 'Radio', val: radioLift },
+        { name: 'Newspaper', val: newsLift }
+      ].sort((a, b) => b.val - a.val);
+
+      elements.topDriver.textContent = drivers[0].name;
+      elements.topDriverImpact.textContent = `${drivers[0].val >= 0 ? '+' : ''}${drivers[0].val.toFixed(2)}k units contributed`;
+
+      // Update Formula Text
+      elements.formula.textContent = `Sales = ${base.toFixed(4)} + (${WEIGHTS.tv.toFixed(4)} × ${tv}) + (${WEIGHTS.radio.toFixed(4)} × ${radio}) + (${WEIGHTS.newspaper.toFixed(4)} × ${news}) = ${totalSales.toFixed(3)}k`;
+
+      // Update Chart Data
+      attributionChart.data.datasets[0].data = [base, tvLift, radioLift, newsLift];
+      attributionChart.update();
+    }
+
+    // Sync input controls with sliders
+    function bindSync(slider, num) {
+      slider.addEventListener('input', (e) => {
+        num.value = e.target.value;
+        calculatePrediction();
+      });
+      num.addEventListener('input', (e) => {
+        slider.value = e.target.value;
+        calculatePrediction();
+      });
+    }
+
+    bindSync(elements.tvSlider, elements.tvNum);
+    bindSync(elements.radioSlider, elements.radioNum);
+    bindSync(elements.newsSlider, elements.newsNum);
+
+    function resetDefaults() {
+      elements.tvSlider.value = elements.tvNum.value = 150;
+      elements.radioSlider.value = elements.radioNum.value = 25;
+      elements.newsSlider.value = elements.newsNum.value = 30;
+      calculatePrediction();
+    }
+
+    // Initial calculation run
+    calculatePrediction();
+  </script>
+</body>
+</html>
